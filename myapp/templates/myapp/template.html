@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Django and Vue.js</title>
+    <style>
+      .router-link-active {
+        color: black;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="bg-white container">
+
+      <div class="jumbotron">
+        <h1 class="display-4">Django and Vue.js</h1>
+        <p class="lead">
+          Wouldn’t it be cool if you could prototype a custom web application that’s responsive (mobile ready), reactive (light-speed fast), with a full–featured back office site to manage the content; all of that in no time? Actually, with a mashup between Django’s and Vue.js, you can! 😁
+        </p>
+      </div>
+      
+      <!-- Content -->
+      <div id="myapp">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <router-link
+                class="nav-link text-primary"
+                to="/author/"
+              >
+                Go to Authors
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link text-primary"
+                to="/article/"
+              >
+                Go to Articles
+              </router-link>
+            </li>
+          </ul>
+        </nav>
+        <br />
+        <router-view></router-view>
+      </div>
+    </div>
+
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-router"></script>
+    <script src="https://unpkg.com/vuex"></script>
+
+    <!-- Vue templates -->
+    <template id="article-list-template">
+      <div class="article-list">
+        <h2>Articles</h2>
+        <article-item
+          v-for="article in articles"
+          v-bind:key="article.slug"
+          v-bind:name="article.name"
+          v-bind:slug="article.slug"
+          v-bind:content="article.content"
+        ></article-item>
+      </div>
+    </template>
+    
+    <template id="author-list-template">
+      <div class="author-list">
+        <h2>Authors</h2>
+        <author-item
+          v-for="author in authors"
+          v-bind:key="author.slug"
+          v-bind:name="author.name"
+          v-bind:slug="author.slug"
+        ></author-item>
+      </div>
+    </template>
+    
+    <template id="article-item-template">
+      <div class="article-item">
+        <span v-if="$route.params.slug">
+          <h3>
+            <router-link
+              v-bind:to="'/article/' + $route.params.slug + '/'"
+              v-html="$store.getters.getArticleBySlug($route.params.slug)['name']"
+            ></router-link>
+          </h3>
+          <div v-html="$store.getters.getArticleBySlug($route.params.slug)['content']"></div>
+        </span>
+        <span v-else>
+          <h3>
+            <router-link
+              v-bind:to="'/article/' + slug + '/'"
+              v-html="name"
+           ></router-link>
+         </h3>
+          <div v-html="content"></div>
+          <hr />
+        </span>
+      </div>
+    </template>
+    
+    <template id="author-item-template">
+      <div class="author-item">
+        <span v-if="$route.params.slug">
+          <b>
+            <router-link v-bind:to="'/author/' + $route.params.slug + '/'">
+              [[ $store.getters.getAuthorBySlug($route.params.slug)['name'] ]]
+            </router-link>
+          </b>
+          ([[ $route.params.slug ]])
+        </span>
+        <span v-else>
+          <b>
+            <router-link v-bind:to="'/author/' + slug + '/'">
+              [[ name ]]
+            </router-link>
+          </b> ([[ slug ]])
+        </span>
+      </div>
+    </template>
+
+    <!-- Vue app -->
+    <script>
+      // store
+      const store = new Vuex.Store({
+        state: {
+            authors: [
+            {% for author in authors %}
+                {
+                  name: '{{ author.name }}',
+                  slug: '{{ author.slug }}',
+                },
+            {% endfor %}
+            ],
+            articles: [
+            {% for article in articles %}
+                {
+                  content: '{{ article.content | linebreaksbr }}',
+                  name: '{{ article.name }}',
+                  slug: '{{ article.slug }}',
+                },
+            {% endfor %}
+            ],
+        },
+        getters: {
+          getArticleBySlug: (state) => (slug) => {
+            return state.articles.find(articles => articles.slug === slug)
+          },
+          getAuthorBySlug: (state) => (slug) => {
+            return state.authors.find(authors => authors.slug === slug)
+          },
+        }
+      })
+
+      // components
+      ArticleList = Vue.component('article-list', {
+        data: function () { return { articles: store.state.articles } },
+        template: '#article-list-template',
+      });      
+
+      AuthorList = Vue.component('author-list', {
+        data: function () { return { authors: store.state.authors } },
+        template: '#author-list-template',
+      });
+
+      ArticleItem = Vue.component('article-item', {
+        delimiters: ['[[', ']]'],
+        props: ['name', 'slug', 'content'],
+        template: '#article-item-template',
+      });
+
+      AuthorItem = Vue.component('author-item', {
+        delimiters: ['[[', ']]'],
+        props: ['name', 'slug'],
+        template: '#author-item-template',
+      });
+
+      // router
+      const routes = [
+        { component: ArticleList, path: '/article/', },
+        { component: AuthorList,  path: '/author/',  },
+        { component: ArticleItem, path: '/article/:slug/', },
+        { component: AuthorItem,  path: '/author/:slug/',  },
+      ]
+
+      const router = new VueRouter({
+        mode: 'history',
+        routes: routes,
+      })
+
+      // app
+      const myapp = new Vue({
+          router,
+          store,
+      }).$mount('#myapp');
+    </script>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  </body>
+</html>
