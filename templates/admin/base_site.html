@@ -1,0 +1,88 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Django with Bootstrap | Admin site{% endblock %}
+
+{% block branding %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block bodyclass %}bg-light{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+      #header, .breadcrumbs { display: none; }
+
+      /* Bootstrap issues with admin */
+      * { box-sizing: unset; }
+      div.module caption { caption-side: top !important; }
+      .collapse { display: block !important; }
+      .navbar li { list-style-type: none; }
+    </style>
+{% endblock %}
+
+{% block bodyheader %}
+    <div class="bg-white container">
+
+      <div class="jumbotron">
+        <h1 class="display-4">Hacking the Django Admin with Bootstrap</h1>
+        <p class="lead">
+          The <a ref="https://docs.djangoproject.com/en/dev/ref/contrib/admin/">Django administration site</a> is great—full-featured, easy to use, secure by design, rock solid… and somewhat ugly, which can be something of a downside when you want to integrate it with the look-and-feel of the rest of the website. Let’s sort that out.
+        </p>
+      </div>
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a
+              class="nav-link text-primary"
+              href="/author/"
+            >
+              Go to Authors
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link text-primary"
+              href="/article/"
+            >
+              Go to Articles
+            </a>
+          </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a
+              aria-expanded="false"
+              aria-haspopup="true"
+              class="font-weight-bold nav-link text-primary dropdown-toggle"
+              data-toggle="dropdown"
+              href="#"
+              role="button"
+            >
+              Admin
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" href="/admin/myapp/author/">
+                Manage authors
+              </a>
+              <a class="dropdown-item" href="/admin/myapp/article/">
+                Manage articles
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="/admin/logout/">
+                Logout
+              </a>
+            </div>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+{% endblock %}
+
+{% block bodyfooter %}
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+{% endblock %}

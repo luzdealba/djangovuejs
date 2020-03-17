@@ -1,0 +1,26 @@
+{% extends "admin/login.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  #header {
+    background-color: transparent !important;
+    display: block;
+  }
+  .navbar  { display: none; }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1>
+  <span style="color: #57C5A5 !important">Django Admin with Bootstrap</span>
+  <br />
+  <small>{% block head_title %}{% endblock %}</small>
+</h1>
+{% endblock %}
+
+{% block content_title %}
+<p class="lead" style="font-size: larger">
+A demo site for <a href="https://www.sitepoint.com/">SitePoint</a>.
+</p>
+{% endblock %}
